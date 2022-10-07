@@ -1,4 +1,4 @@
-# ethers-multicall
+# Gnosis Tx-Builder from a script
 
 [![npm package][npm-img]][npm-url]
 [![Build Status][build-img]][build-url]
@@ -7,50 +7,56 @@
 [![Commitizen Friendly][commitizen-img]][commitizen-url]
 [![Semantic Release][semantic-release-img]][semantic-release-url]
 
-> ⚡🚀 Call multiple view functions, from multiple Smart Contracts, in a single RPC query!
+> ⚡🚀 Transform an array of transaction in a Tx builder json for the Gnosis UX, based on ethers-js
 
-Querying an RPC endpoint can be very costly (**100+ queries**) when loading data from multiple smart contracts.
-With multicall, batch these queries into a single, on-chain query, without additional over-head!
-
-This is the standalone package of the library formerly created & used by [Zapper](https://github.com/Zapper-fi/studio/tree/main/src/multicall).
 
 ## Install
 
 ```bash
-npm install ethers-multicall
+npm install @morpho-labs/gnosis-tx-builder
 ```
 
 ```bash
-yarn add ethers-multicall
+yarn add @morpho-labs/gnosis-tx-builder
 ```
 
 ## Usage
 
 ```typescript
-import { ethers } from "ethers";
+import { batchToTxBuilder  } from "@morpho-labs/gnosis-tx-builder";
+import { constants } from "ethers";
+import fs from "fs"
+const safeAddress = "0x12341234123412341234123412341232412341234"
 
-import { EthersMulticall } from "@morpho-labs/ethers-multicall";
+const transactions = [
+    {
+        to: constants.AddressZero,
+        operation: OperationType.DelegateCall,
+        value: parseEther("1").toString(),
+        data: "0x",
+    },
+];
 
-const provider = new ethers.providers.JsonRpcBatchProvider("...");
-const multicall = new EthersMulticall(provider);
+const batchJson = batchToTxBuilder(safeAddress, transactions);
 
-const uni = multicall.wrap(
-  new ethers.Contract("0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984", UniswapAbi)
-); // make sure to always wrap contracts to benefit from multicalls
+console.log(batchJson);
 
-Promise.all([uni.name(), uni.symbol(), uni.decimals()]).then(console.log);
+// dump into a file
+fs.writeFileSync("batchTx.json", JSON.stringify(batchJson, null, 2));
+
+
 ```
 
-[build-img]: https://github.com/morpho-labs/ethers-multicall/actions/workflows/release.yml/badge.svg
-[build-url]: https://github.com/morpho-labs/ethers-multicall/actions/workflows/release.yml
-[downloads-img]: https://img.shields.io/npm/dt/@morpho-labs/ethers-multicall
-[downloads-url]: https://www.npmtrends.com/@morpho-labs/ethers-multicall
-[npm-img]: https://img.shields.io/npm/v/@morpho-labs/ethers-multicall
-[npm-url]: https://www.npmjs.com/package/@morpho-labs/ethers-multicall
-[issues-img]: https://img.shields.io/github/issues/morpho-labs/ethers-multicall
-[issues-url]: https://github.com/morpho-labs/ethers-multicall/issues
-[codecov-img]: https://codecov.io/gh/morpho-labs/ethers-multicall/branch/main/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/morpho-labs/ethers-multicall
+[build-img]: https://github.com/morpho-labs/gnosis-tx-builder/actions/workflows/release.yml/badge.svg
+[build-url]: https://github.com/morpho-labs/gnosis-tx-builder/actions/workflows/release.yml
+[downloads-img]: https://img.shields.io/npm/dt/@morpho-labs/gnosis-tx-builder
+[downloads-url]: https://www.npmtrends.com/@morpho-labs/gnosis-tx-builder
+[npm-img]: https://img.shields.io/npm/v/@morpho-labs/gnosis-tx-builder
+[npm-url]: https://www.npmjs.com/package/@morpho-labs/gnosis-tx-builder
+[issues-img]: https://img.shields.io/github/issues/morpho-labs/gnosis-tx-builder
+[issues-url]: https://github.com/morpho-labs/gnosis-tx-builder/issues
+[codecov-img]: https://codecov.io/gh/morpho-labs/gnosis-tx-builder/branch/main/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/morpho-labs/gnosis-tx-builder
 [semantic-release-img]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
 [semantic-release-url]: https://github.com/semantic-release/semantic-release
 [commitizen-img]: https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
