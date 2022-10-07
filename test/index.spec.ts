@@ -2,12 +2,12 @@ import { constants } from "ethers";
 import { parseEther } from "ethers/lib/utils";
 
 import { batchToTxBuilder } from "../src";
-import { BatchFile, OperationType } from "../src/types";
+import { BatchFile } from "../src/types";
 
 describe("@morpho-labs/gnosis-tx-builder", () => {
   let txBuilderJson: BatchFile;
   beforeAll(() => {
-    global.Date.now = jest.fn(() => 1665177409_513);
+    global.Date.now = jest.fn(() => 1665179771184);
 
     txBuilderJson = {
       version: "1.0",
@@ -15,9 +15,9 @@ describe("@morpho-labs/gnosis-tx-builder", () => {
       createdAt: Date.now(),
       meta: {
         name: "Transactions Batch",
-        checksum: "0xcc15ad0f6efe4476b91fdb28019f8006198056434b8746f177b37f07bb3e86f8",
+        checksum: "0x0e8bc7db05f5d3272681a16a52c08de6f1400b8afd76d332e771e5473bcca49e",
         description: "Created from @morpho-labs/gnosis-tx-builder",
-        txBuilderVersion: "1.8.0",
+        txBuilderVersion: "1.10.0",
         createdFromSafeAddress: constants.AddressZero,
         createdFromOwnerAddress: "",
       },
@@ -27,7 +27,6 @@ describe("@morpho-labs/gnosis-tx-builder", () => {
   const transactions = [
     {
       to: constants.AddressZero,
-      operation: OperationType.DelegateCall,
       value: parseEther("1").toString(),
       data: "0x",
     },
@@ -55,9 +54,11 @@ describe("@morpho-labs/gnosis-tx-builder", () => {
         name: "Name override",
         createdAt: 1000,
         description: "My mock description",
+        txBuilderVersion: "1.0.0",
       });
       expect(batchFile.meta.name).toEqual("Name override");
       expect(batchFile.meta.description).toEqual("My mock description");
+      expect(batchFile.meta.txBuilderVersion).toEqual("1.0.0");
       expect(batchFile.createdAt).toEqual(1000);
     });
   });

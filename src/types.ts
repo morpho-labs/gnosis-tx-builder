@@ -1,15 +1,11 @@
 export type Address = string;
 
-export enum OperationType {
-  Call = 0,
-  DelegateCall = 1,
-}
-
 export interface Options {
   chainId?: number;
   name?: string;
   description?: string;
   createdAt?: number;
+  txBuilderVersion?: string;
 }
 
 export interface BatchFile {
@@ -32,8 +28,7 @@ export interface BatchFileMeta {
 export interface BatchTransaction {
   to: Address;
   value: string;
-  data?: string;
-  operation: OperationType;
+  data?: string | null;
   contractMethod?: ContractMethod;
   contractInputsValues?: { [key: string]: string };
 }

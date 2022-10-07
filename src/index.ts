@@ -10,11 +10,11 @@ export const batchToTxBuilder = (
   addChecksum({
     version: "1.0",
     chainId: options.chainId?.toString() ?? "1",
-    createdAt: options?.createdAt ?? Date.now(),
+    createdAt: options.createdAt ?? Date.now(),
     meta: {
-      name: options?.name ?? DEFAULT_OPTIONS.name,
-      description: options?.description ?? DEFAULT_OPTIONS.description,
-      txBuilderVersion: "1.8.0",
+      name: options.name ?? DEFAULT_OPTIONS.name,
+      description: options.description ?? DEFAULT_OPTIONS.description,
+      txBuilderVersion: options.txBuilderVersion ?? DEFAULT_OPTIONS.txBuilderVersion,
       createdFromSafeAddress: safe,
       createdFromOwnerAddress: "",
     },
