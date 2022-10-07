@@ -1,0 +1,45 @@
+import { utils } from "ethers";
+
+import { BatchFile } from "./types";
+
+export const stringifyReplacer = (_: string, value: any) => (value === undefined ? null : value);
+
+export const serializeJSONObject = (json: any): string => {
+  if (Array.isArray(json)) {
+    return `[${json.map((el) => serializeJSONObject(el)).join(",")}]`;
+  }
+
+  if (typeof json === "object" && json !== null) {
+    let acc = "";
+    const keys = Object.keys(json).sort();
+    acc += `{${JSON.stringify(keys, stringifyReplacer)}`;
+
+    for (let i = 0; i < keys.length; i++) {
+      acc += `${serializeJSONObject(json[keys[i]])},`;
+    }
+
+    return `${acc}}`;
+  }
+
+  return `${JSON.stringify(json, stringifyReplacer)}`;
+};
+
+const calculateChecksum = (batchFile: BatchFile): string | undefined => {
+  const serialized = serializeJSONObject({
+    ...batchFile,
+    meta: { ...batchFile.meta, name: null },
+  });
+  const sha = utils.solidityKeccak256(["string"], [serialized]);
+
+  return sha || undefined;
+};
+
+export const addChecksum = (batchFile: BatchFile): BatchFile => {
+  return {
+    ...batchFile,
+    meta: {
+      ...batchFile.meta,
+      checksum: calculateChecksum(batchFile),
+    },
+  };
+};
