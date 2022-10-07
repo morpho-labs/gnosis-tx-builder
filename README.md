@@ -7,7 +7,7 @@
 [![Commitizen Friendly][commitizen-img]][commitizen-url]
 [![Semantic Release][semantic-release-img]][semantic-release-url]
 
-> ⚡🚀 Transform an array of transaction in a Tx builder json for the Gnosis UX, based on ethers-js
+> ⚡🚀 Transform an array of transactions in a Transaction builder json for the Gnosis UX, based on ethers-js
 
 
 ## Install
@@ -21,6 +21,7 @@ yarn add @morpho-labs/gnosis-tx-builder
 ```
 
 ## Usage
+Generate a Tx builder json file:
 
 ```typescript
 import { batchToTxBuilder  } from "@morpho-labs/gnosis-tx-builder";
@@ -31,7 +32,6 @@ const safeAddress = "0x12341234123412341234123412341232412341234"
 const transactions = [
     {
         to: constants.AddressZero,
-        operation: OperationType.DelegateCall,
         value: parseEther("1").toString(),
         data: "0x",
     },
@@ -39,14 +39,24 @@ const transactions = [
 
 const batchJson = batchToTxBuilder(safeAddress, transactions);
 
-console.log(batchJson);
-
 // dump into a file
 fs.writeFileSync("batchTx.json", JSON.stringify(batchJson, null, 2));
 
 
 ```
 
+Now, with the json file, go to the Gnosis dApp, and select Transaction Builder app
+
+[![Transaction builder][txbuilder-img]][gnosis-url]
+
+And then, drag and drop the `batchTx.json` file 
+
+![img.png](img/dnd.png)
+
+And tada! 🎉🎉
+
+[txbuilder-img]: img/tx-builder.png
+[gnosis-url]: https://gnosis-safe.io/app
 [build-img]: https://github.com/morpho-labs/gnosis-tx-builder/actions/workflows/release.yml/badge.svg
 [build-url]: https://github.com/morpho-labs/gnosis-tx-builder/actions/workflows/release.yml
 [downloads-img]: https://img.shields.io/npm/dt/@morpho-labs/gnosis-tx-builder
