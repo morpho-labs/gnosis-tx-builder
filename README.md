@@ -24,7 +24,7 @@ yarn add @morpho-labs/gnosis-tx-builder
 Generate a Tx builder json file:
 
 ```typescript
-import { batchToTxBuilder  } from "@morpho-labs/gnosis-tx-builder";
+import TxBuilder from "@morpho-labs/gnosis-tx-builder";
 import { constants } from "ethers";
 import fs from "fs"
 const safeAddress = "0x12341234123412341234123412341232412341234"
@@ -37,7 +37,7 @@ const transactions = [
     },
 ];
 
-const batchJson = batchToTxBuilder(safeAddress, transactions);
+const batchJson = TxBuilder.batch(safeAddress, transactions);
 
 // dump into a file
 fs.writeFileSync("batchTx.json", JSON.stringify(batchJson, null, 2));
