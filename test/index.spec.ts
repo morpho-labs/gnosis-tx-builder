@@ -1,7 +1,7 @@
 import { constants } from "ethers";
 import { parseEther } from "ethers/lib/utils";
 
-import { batchToTxBuilder } from "../src";
+import { TxBuilder } from "../src";
 import { BatchFile } from "../src/types";
 
 describe("@morpho-labs/gnosis-tx-builder", () => {
@@ -36,21 +36,21 @@ describe("@morpho-labs/gnosis-tx-builder", () => {
 
   describe("Should return correct object", () => {
     it("should create a correct tx builder file", async () => {
-      const batchFile = batchToTxBuilder(safe, transactions);
+      const batchFile = TxBuilder.batch(safe, transactions);
       expect(batchFile).toEqual(txBuilderJson);
     });
     it("should set default chain id correctly", async () => {
-      let batchFile = batchToTxBuilder(safe, transactions);
+      let batchFile = TxBuilder.batch(safe, transactions);
       expect(batchFile.chainId).toEqual("1");
-      batchFile = batchToTxBuilder(safe, transactions, {});
+      batchFile = TxBuilder.batch(safe, transactions, {});
       expect(batchFile.chainId).toEqual("1");
     });
     it("should set correctly the chain id", async () => {
-      const batchFile = batchToTxBuilder(safe, transactions, { chainId: 123 });
+      const batchFile = TxBuilder.batch(safe, transactions, { chainId: 123 });
       expect(batchFile.chainId).toEqual("123");
     });
     it("should overrides parameters correctly", async () => {
-      const batchFile = batchToTxBuilder(safe, transactions, {
+      const batchFile = TxBuilder.batch(safe, transactions, {
         name: "Name override",
         createdAt: 1000,
         description: "My mock description",
