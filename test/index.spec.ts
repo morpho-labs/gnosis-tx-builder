@@ -2,6 +2,7 @@ import { constants } from "ethers";
 import { parseEther } from "ethers/lib/utils";
 
 import { TxBuilder } from "../src";
+import { ErrorCode, ParsingError, TransactionParsingError } from "../src/errors";
 import { BatchFile } from "../src/types";
 
 describe("@morpho-labs/gnosis-tx-builder", () => {
@@ -60,6 +61,173 @@ describe("@morpho-labs/gnosis-tx-builder", () => {
       expect(batchFile.meta.description).toEqual("My mock description");
       expect(batchFile.meta.txBuilderVersion).toEqual("1.0.0");
       expect(batchFile.createdAt).toEqual(1000);
+    });
+  });
+
+  describe("Should correctly parse a batch file", () => {
+    it("should return an error if the batch file can't be parsed", () => {
+      expect(() => TxBuilder.parse(JSON.stringify(["not an object"]))).toThrow(
+        new ParsingError(ErrorCode.wrongFormat)
+      );
+      expect(() =>
+        TxBuilder.parse(JSON.stringify({ name: "object without transactions" }))
+      ).toThrow(new ParsingError(ErrorCode.wrongFormat));
+      expect(() => TxBuilder.parse(JSON.stringify({ transactions: "not an array" }))).toThrow(
+        new ParsingError(ErrorCode.wrongFormat)
+      );
+    });
+    it("should return an error if a transaction doesn't have the correct type", () => {
+      expect(() => TxBuilder.parse(JSON.stringify({ transactions: ["not an object"] }))).toThrow(
+        new TransactionParsingError(0, ErrorCode.wrongTxFormat)
+      );
+      expect(() =>
+        TxBuilder.parse(JSON.stringify({ transactions: [{ ...transactions[0], to: 123 }] }))
+      ).toThrow(new TransactionParsingError(0, ErrorCode.wrongTxFormat, "to"));
+      expect(() =>
+        TxBuilder.parse(JSON.stringify({ transactions: [{ ...transactions[0], value: 123 }] }))
+      ).toThrow(new TransactionParsingError(0, ErrorCode.wrongTxFormat, "value"));
+      expect(() =>
+        TxBuilder.parse(JSON.stringify({ transactions: [{ ...transactions[0], data: 123 }] }))
+      ).toThrow(new TransactionParsingError(0, ErrorCode.wrongTxFormat, "data"));
+      expect(() =>
+        TxBuilder.parse(
+          JSON.stringify({
+            transactions: [{ ...transactions[0], contractInputsValues: "not an object" }],
+          })
+        )
+      ).toThrow(new TransactionParsingError(0, ErrorCode.wrongTxFormat, "contractInputsValues"));
+      expect(() =>
+        TxBuilder.parse(
+          JSON.stringify({
+            transactions: [
+              { ...transactions[0], contractInputsValues: { string: "", notAString: 0 } },
+            ],
+          })
+        )
+      ).toThrow(new TransactionParsingError(0, ErrorCode.wrongTxFormat, "contractInputsValues"));
+      expect(() =>
+        TxBuilder.parse(
+          JSON.stringify({
+            transactions: [{ ...transactions[0], contractMethod: "not an object" }],
+          })
+        )
+      ).toThrow(new TransactionParsingError(0, ErrorCode.wrongTxFormat, "contractMethod"));
+      expect(() =>
+        TxBuilder.parse(
+          JSON.stringify({
+            transactions: [
+              { ...transactions[0], contractMethod: { inputs: [], name: 0, payable: true } },
+            ],
+          })
+        )
+      ).toThrow(new TransactionParsingError(0, ErrorCode.wrongTxFormat, "contractMethod"));
+      expect(() =>
+        TxBuilder.parse(
+          JSON.stringify({
+            transactions: [
+              {
+                ...transactions[0],
+                contractMethod: { inputs: [], name: "string", payable: "not a boolean" },
+              },
+            ],
+          })
+        )
+      ).toThrow(new TransactionParsingError(0, ErrorCode.wrongTxFormat, "contractMethod"));
+      expect(() =>
+        TxBuilder.parse(
+          JSON.stringify({
+            transactions: [
+              {
+                ...transactions[0],
+                contractMethod: { inputs: ["not an object"], name: "string", payable: true },
+              },
+            ],
+          })
+        )
+      ).toThrow(new TransactionParsingError(0, ErrorCode.wrongTxFormat, "contractMethod"));
+      expect(() =>
+        TxBuilder.parse(
+          JSON.stringify({
+            transactions: [
+              {
+                ...transactions[0],
+                contractMethod: {
+                  inputs: [{ name: 0, type: "", components: [], internalType: "" }],
+                  name: "string",
+                  payable: true,
+                },
+              },
+            ],
+          })
+        )
+      ).toThrow(new TransactionParsingError(0, ErrorCode.wrongTxFormat, "contractMethod"));
+      expect(() =>
+        TxBuilder.parse(
+          JSON.stringify({
+            transactions: [
+              {
+                ...transactions[0],
+                contractMethod: {
+                  inputs: [{ name: "", type: 0, components: [], internalType: "" }],
+                  name: "string",
+                  payable: true,
+                },
+              },
+            ],
+          })
+        )
+      ).toThrow(new TransactionParsingError(0, ErrorCode.wrongTxFormat, "contractMethod"));
+      expect(() =>
+        TxBuilder.parse(
+          JSON.stringify({
+            transactions: [
+              {
+                ...transactions[0],
+                contractMethod: {
+                  inputs: [{ name: "", type: "", components: [], internalType: 0 }],
+                  name: "string",
+                  payable: true,
+                },
+              },
+            ],
+          })
+        )
+      ).toThrow(new TransactionParsingError(0, ErrorCode.wrongTxFormat, "contractMethod"));
+    });
+    it("should parse correcly several transactions", () => {
+      const batchFileMock = {
+        transactions: [
+          {
+            to: "0x0001",
+            value: "123",
+            data: "0x1234",
+          },
+          {
+            to: "0x0002",
+            value: "456",
+            data: "0x4567",
+            contractInputsValues: {
+              key1: "value1",
+              key2: "value2",
+            },
+            contractMethod: {
+              inputs: [
+                {
+                  name: "name",
+                  type: "type",
+                  components: [{ name: "name2", type: "type2", internalType: "intType2" }],
+                  internalType: "intType",
+                },
+              ],
+              name: "string",
+              payable: true,
+            },
+          },
+        ],
+      };
+
+      expect(() => TxBuilder.parse(JSON.stringify(batchFileMock))).not.toThrow();
+      expect(TxBuilder.parse(JSON.stringify(batchFileMock))).toEqual(batchFileMock.transactions);
     });
   });
 });
