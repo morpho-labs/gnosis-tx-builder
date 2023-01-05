@@ -24,10 +24,12 @@ export const serializeJSONObject = (json: any): string => {
   return `${JSON.stringify(json, stringifyReplacer)}`;
 };
 
-const calculateChecksum = (batchFile: BatchFile): string | undefined => {
+export const calculateChecksum = (batchFile: BatchFile): string | undefined => {
+  const batchFileMeta = { ...batchFile.meta };
+  delete batchFileMeta.checksum;
   const serialized = serializeJSONObject({
     ...batchFile,
-    meta: { ...batchFile.meta, name: null },
+    meta: { ...batchFileMeta, name: null },
   });
   const sha = utils.solidityKeccak256(["string"], [serialized]);
 

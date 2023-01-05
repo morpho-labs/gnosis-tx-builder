@@ -3,6 +3,7 @@ import { ContractInput } from "./types";
 export enum ErrorCode {
   wrongFormat = "WRONG_FORMAT",
   wrongTxFormat = "WRONG_TRANSACTION_FORMAT",
+  invalidChecksum = "INVALID_CHECKSUM",
 }
 
 export class ParsingError extends Error {
@@ -13,10 +14,17 @@ export class ParsingError extends Error {
 }
 
 export class TransactionParsingError extends ParsingError {
-  constructor(public index: number, code: ErrorCode, public parameter?: string) {
-    super(code);
-    this.message = `Cannot parse transaction at index ${index}.\nError code: ${code}`;
+  constructor(public index: number, public parameter?: string) {
+    super(ErrorCode.wrongTxFormat);
+    this.message = `Cannot parse transaction at index ${index}.`;
     if (parameter) this.message += `\nParameter: ${parameter}`;
+  }
+}
+
+export class ChecksumParsingError extends ParsingError {
+  constructor(expected?: string, computed?: string) {
+    super(ErrorCode.invalidChecksum);
+    this.message = `Invalid checksum.\nExpected: ${expected}\nComputed: ${computed}`;
   }
 }
 
