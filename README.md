@@ -9,7 +9,6 @@
 
 > ⚡🚀 Transform an array of transactions in a Transaction builder json for the Gnosis UX, based on ethers-js
 
-
 ## Install
 
 ```bash
@@ -21,39 +20,96 @@ yarn add @morpho-labs/gnosis-tx-builder
 ```
 
 ## Usage
+
+### Generate JSON
+
 Generate a Tx builder json file:
 
 ```typescript
-import TxBuilder from "@morpho-labs/gnosis-tx-builder";
 import { constants } from "ethers";
-import fs from "fs"
-const safeAddress = "0x12341234123412341234123412341232412341234"
+import fs from "fs";
+
+import TxBuilder, {
+  ParsingError,
+  ChecksumParsingError,
+  TransactionParsingError,
+} from "@morpho-labs/gnosis-tx-builder";
+
+const safeAddress = "0x12341234123412341234123412341232412341234";
 
 const transactions = [
-    {
-        to: constants.AddressZero,
-        value: parseEther("1").toString(),
-        data: "0x",
-    },
+  {
+    to: constants.AddressZero,
+    value: parseEther("1").toString(),
+    data: "0x",
+  },
 ];
 
 const batchJson = TxBuilder.batch(safeAddress, transactions);
 
 // dump into a file
 fs.writeFileSync("batchTx.json", JSON.stringify(batchJson, null, 2));
-
-
 ```
 
 Now, with the json file, go to the Gnosis dApp, and select Transaction Builder app
 
 [![Transaction builder][txbuilder-img]][gnosis-url]
 
-And then, drag and drop the `batchTx.json` file 
+And then, drag and drop the `batchTx.json` file
 
 ![img.png](img/dnd.png)
 
 And tada! 🎉🎉
+
+### Parse JSON
+
+Parse transactions from a Tx Builder JSON file:
+
+```typescript
+import fs from "fs";
+
+import TxBuilder from "@morpho-labs/gnosis-tx-builder";
+
+// read from a file
+const batchJson = fs.readFileSync("batchTx.json");
+
+try {
+  const batch = TxBuilder.parse(batchJson);
+
+  console.log(batch);
+  /*
+    [
+        {
+            to: "0x000000000000000000000000",
+            value: "1000000000000000000",
+            data: "0x",
+        },
+    ]
+    */
+} catch (e: ParsingError) {
+  if (e instanceof ChecksumParsingError) console.debug(e.params); // { code: ErrorCode; expected: string; computed: string }
+  if (e instanceof TransactionParsingError) console.debug(e.params); // { code: ErrorCode; index: number; parameter?: string }
+  console.debug(e.params); // { code: ErrorCode }
+}
+```
+
+#### Error Codes
+
+You can import the error codes from the package
+
+```typescript
+import { ErrorCode } from "@morpho-labs/gnosis-tx-builder";
+```
+
+Available codes
+
+```typescript
+export enum ErrorCode {
+  wrongFormat = "WRONG_FORMAT", //The json file don't match the expected format ({ meta:..., transactions: [...] })
+  wrongTxFormat = "WRONG_TRANSACTION_FORMAT", //The transaction at index `index` doesn't match the expected format (not an object or parameter `parameter` doesn't have the right type)
+  invalidChecksum = "INVALID_CHECKSUM", //The computed checksum doesn't match the expected one (the one in the file)
+}
+```
 
 [txbuilder-img]: img/tx-builder.png
 [gnosis-url]: https://gnosis-safe.io/app
