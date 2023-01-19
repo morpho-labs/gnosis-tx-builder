@@ -6,11 +6,15 @@ import {
   TransactionParsingError,
   validateContractMethod,
 } from "./errors";
-import { Address, BatchTransaction, Options } from "./types";
+import { Address, BatchFile, BatchTransaction, Options } from "./types";
 import { addChecksum, calculateChecksum } from "./utils";
 
 export default class TxBuilder {
-  static batch = (safe: Address, transactions: BatchTransaction[], options: Options = {}) =>
+  static batch = (
+    safe: Address,
+    transactions: BatchTransaction[],
+    options: Options = {}
+  ): BatchFile =>
     addChecksum({
       version: "1.0",
       chainId: options.chainId?.toString() ?? "1",
