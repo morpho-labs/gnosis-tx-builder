@@ -1,5 +1,4 @@
-import { constants } from "ethers";
-import { parseEther } from "ethers/lib/utils";
+import { ZeroAddress, parseEther } from "ethers";
 
 import { TxBuilder } from "../src";
 import {
@@ -25,7 +24,7 @@ describe("@morpho-labs/gnosis-tx-builder", () => {
         checksum: "0x0e8bc7db05f5d3272681a16a52c08de6f1400b8afd76d332e771e5473bcca49e",
         description: "Created from @morpho-labs/gnosis-tx-builder",
         txBuilderVersion: "1.10.0",
-        createdFromSafeAddress: constants.AddressZero,
+        createdFromSafeAddress: ZeroAddress,
         createdFromOwnerAddress: "",
       },
       transactions,
@@ -33,13 +32,13 @@ describe("@morpho-labs/gnosis-tx-builder", () => {
   });
   const transactions = [
     {
-      to: constants.AddressZero,
+      to: ZeroAddress,
       value: parseEther("1").toString(),
       data: "0x",
     },
   ];
 
-  const safe = constants.AddressZero;
+  const safe = ZeroAddress;
 
   describe("Should return correct object", () => {
     it("should create a correct tx builder file", async () => {

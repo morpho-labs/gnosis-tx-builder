@@ -1,4 +1,4 @@
-import { utils } from "ethers";
+import { solidityPackedKeccak256 } from "ethers";
 
 import { BatchFile } from "./types";
 
@@ -31,7 +31,7 @@ export const calculateChecksum = (batchFile: BatchFile): string | undefined => {
     ...batchFile,
     meta: { ...batchFileMeta, name: null },
   });
-  const sha = utils.solidityKeccak256(["string"], [serialized]);
+  const sha = solidityPackedKeccak256(["string"], [serialized]);
 
   return sha || undefined;
 };
