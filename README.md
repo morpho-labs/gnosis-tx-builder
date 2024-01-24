@@ -26,7 +26,7 @@ yarn add @morpho-labs/gnosis-tx-builder
 Generate a Tx builder json file:
 
 ```typescript
-import { constants } from "ethers";
+import { ZeroAddress, parseEther } from "ethers";
 import fs from "fs";
 
 import TxBuilder, {
@@ -39,7 +39,7 @@ const safeAddress = "0x12341234123412341234123412341232412341234";
 
 const transactions = [
   {
-    to: constants.AddressZero,
+    to: ZeroAddress,
     value: parseEther("1").toString(),
     data: "0x",
   },
