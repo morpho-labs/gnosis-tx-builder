@@ -17,7 +17,6 @@
     "typecheck": "tsc --noEmit"
   },
   "repository": "git@github.com:morpho-labs/gnosis-tx-builder.git",
-
   "license": "MIT",
   "author": {
     "name": "Julien (Devatom)",
@@ -25,7 +24,7 @@
     "url": "https://github.com/julien-devatom"
   },
   "engines": {
-    "node": ">=12.0"
+    "node": ">=16.0"
   },
   "keywords": [
     "ethers",
@@ -38,11 +37,9 @@
   },
   "homepage": "https://github.com/morpho-labs/gnosis-tx-builder#readme",
   "dependencies": {
-    "ethers": "^5.7.0"
+    "ethers": "^6.9.2"
   },
   "devDependencies": {
-    "@ethersproject/abi": "^5.7.0",
-    "@ethersproject/providers": "^5.7.0",
     "@trivago/prettier-plugin-sort-imports": "^3.3.0",
     "@types/jest": "^27.5.2",
     "@typescript-eslint/eslint-plugin": "^5.34.0",
@@ -63,11 +60,8 @@
     "typescript": "^4.7.4"
   },
   "peerDependencies": {
-    "ethers": "^5.7.0",
-    "@ethersproject/abi": "^5.7.0",
-    "@ethersproject/providers": "^5.7.0"
+    "ethers": "^6.9.2"
   },
-
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
